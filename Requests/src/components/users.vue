@@ -1,6 +1,12 @@
 <template>
   <div class="row">
-    <div class="col-auto mb-4" v-for="user in data.users" :key="user.id">
+    <div v-if="data.loading"><app-loader></app-loader></div>
+    <div
+      v-if="!data.loading"
+      class="col-auto mb-4"
+      v-for="user in data.users"
+      :key="user.id"
+    >
       <div class="card" style="width: 14rem">
         <img
           class="card-img-top"
@@ -21,20 +27,37 @@
 <script setup>
 import axios from "axios";
 import { reactive, onMounted } from "vue";
+import { useToast } from "vue-toast-notification";
+
+const $toast = useToast();
 
 const data = reactive({
   users: [],
+  loading: true,
 });
 
-const loadUsers = () => {
-  axios
-    .get(`http://localhost:3004/users`)
-    .then((response) => {
-      data.users = response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+// const loadUsers = () => {
+//   axios
+//     .get(`http://localhost:3004/users`)
+//     .then((response) => {
+//       data.users = response.data;
+//       data.loading = false;
+//     })
+//     .catch((error) => {
+//       $toast.error("Sorry, Something went wrong");
+//       data.loading = false;
+//     });
+// };
+
+const loadUsers = async () => {
+  try {
+    const response = await axios.get(`http://localhost:3004/users`);
+    data.users = response.data;
+    data.loading = false;
+  } catch (error) {
+    $toast.error("Sorry, Something went wrong");
+    data.loading = false;
+  }
 };
 
 onMounted(() => {
