@@ -15,41 +15,21 @@
         <input class="form-control" type="text" v-model="user.lastname" />
       </div>
 
-      <button class="btn btn-primary" @click.prevent="submitForm">
-        Submit
-      </button>
+      <button class="btn btn-primary" @click.prevent="addUser()">Submit</button>
     </div>
   </div>
 </template>
 
 <script setup>
-import axios from "axios";
-import { reactive, ref } from "vue";
-import { useToast } from "vue-toast-notification";
-
-const $toast = useToast();
-const loading = ref(false);
+import postUser from "@/composables/postUser";
+import { reactive } from "vue";
 
 const user = reactive({
   name: "",
   lastname: "",
 });
 
-const submitForm = () => {
-  loading.value = true;
-  axios({
-    method: "POST",
-    url: "http://localhost:3004/users",
-    data: user,
-  })
-    .then(() => {
-      $toast.success("User Added");
-    })
-    .catch((error) => {
-      $toast.error("Sorry, Something went wrong");
-    })
-    .finally(() => {
-      loading.value = false;
-    });
-};
+const { loading, addUser } = postUser(user);
+
+
 </script>
